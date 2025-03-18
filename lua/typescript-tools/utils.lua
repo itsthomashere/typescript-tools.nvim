@@ -129,4 +129,40 @@ function M.run_once(func)
   end
 end
 
+--- Code from [nvim-lspconfig](https://github.com/neovim/nvim-lspconfig/blob/master/lua/lspconfig/util.lua)
+function M.search_ancestors(startpath, func)
+  local nvim_eleven = vim.fn.has "nvim-0.11" == 1
+  if nvim_eleven then
+    vim.validate("func", func, "function")
+  end
+  if func(startpath) then
+    return startpath
+  end
+  local guard = 100
+  for path in vim.fs.parents(startpath) do
+    -- Prevent infinite recursion if our algorithm breaks
+    guard = guard - 1
+    if guard == 0 then
+      return
+    end
+
+    if func(path) then
+      return path
+    end
+  end
+end
+
+--- Code from [nvim-lspconfig](https://github.com/neovim/nvim-lspconfig/blob/master/lua/lspconfig/util.lua)
+function M.bufname_valid(bufname)
+  if
+    bufname:match "^/"
+    or bufname:match "^[a-zA-Z]:"
+    or bufname:match "^zipfile://"
+    or bufname:match "^tarfile:"
+  then
+    return true
+  end
+  return false
+end
+
 return M
